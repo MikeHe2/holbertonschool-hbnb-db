@@ -2,26 +2,33 @@
 Place related functionality
 """
 
-from src.models.base import Base
+from sqlalchemy import ForeignKey
 from src.models.city import City
 from src.models.user import User
+from src.models import db
 
 
-class Place(Base):
+class Place(db.Model):
     """Place representation"""
 
-    name: str
-    description: str
-    address: str
-    latitude: float
-    longitude: float
-    host_id: str
-    city_id: str
-    price_per_night: int
-    number_of_rooms: int
-    number_of_bathrooms: int
-    max_guests: int
+    __tablename__ = 'places'
 
+    name = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    address = db.Column(db.String(255), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    host_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    city_id = db.Column(db.String(36), db.ForeignKey('cities.id'), nullable=False)
+    price_per_night = db.Column(db.Integer, nullable=False)
+    number_of_rooms = db.Column(db.Integer, nullable=False)
+    number_of_bathrooms = db.Column(db.Integer, nullable=False)
+    max_guests = db.Column(db.Integer, nullable=False)
+
+    host = db.relationship('User', back_populates='places')
+    city = db.relationship('City', back_populates='places')
+    amenities = db.relationship('PlaceAmenity', back_populates='place', lazy='dynamic')
+    reviews = db.relationship('Review', back_populates='place', lazy='dynamic')
     def __init__(self, data: dict | None = None, **kw) -> None:
         """Dummy init"""
         super().__init__(**kw)

@@ -1,9 +1,11 @@
+from src.models import db
+
 """
 Country related functionality
 """
 
 
-class Country:
+class Country(db.Model):
     """
     Country representation
 
@@ -12,9 +14,13 @@ class Country:
     This class is used to get and list countries
     """
 
-    name: str
-    code: str
-    cities: list
+    __tablename__ = 'countries'
+
+
+    code = db.Column(db.String(3), primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    cities = db.relationship('City', back_populates='country')
+
 
     def __init__(self, name: str, code: str, **kw) -> None:
         """Dummy init"""

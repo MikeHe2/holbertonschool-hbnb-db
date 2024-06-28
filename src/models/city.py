@@ -4,13 +4,19 @@ City related functionality
 
 from src.models.base import Base
 from src.models.country import Country
+from src.models import db
+from sqlalchemy import ForeignKey
 
 
-class City(Base):
+class City(db.Model):
     """City representation"""
 
-    name: str
-    country_code: str
+    __tablename__ = 'cities'
+
+    name = db.Column(db.String(120), nullable=False)
+    country_code = db.Column(db.String(3), db.ForeignKey('countries.code'), nullable=False)
+    country = db.relationship('Country', back_populates='cities')
+    places = db.relationship('Place', back_populates='city')
 
     def __init__(self, name: str, country_code: str, **kw) -> None:
         """Dummy init"""
