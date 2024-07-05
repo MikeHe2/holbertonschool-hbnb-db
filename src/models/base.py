@@ -6,7 +6,7 @@ import uuid
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, String, DateTime
-
+import os
 
 class Base(DeclarativeBase):
     """
@@ -50,8 +50,10 @@ class Base(DeclarativeBase):
         it should override this method
         """
         from src.persistence import repo
-
-        return repo.get(cls.__name__.lower(), id)
+        if os.getenv("REPOSITORY") == "file":
+            return repo.get(cls.__name__.lower(), id)
+        else:
+            return repo.get(cls, id)
 
     @classmethod
     def get_all(cls) -> list["Any"]:
@@ -62,8 +64,10 @@ class Base(DeclarativeBase):
         it should override this method
         """
         from src.persistence import repo
-
-        return repo.get_all(cls.__name__.lower())
+        if os.getenv("REPOSITORY") == "file":
+            return repo.get_all(cls.__name__.lower())
+        else:
+            return repo.get_all(cls)
 
     @classmethod
     def delete(cls, id) -> bool:

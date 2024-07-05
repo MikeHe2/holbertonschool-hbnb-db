@@ -1,4 +1,6 @@
 from src.models import db
+from sqlalchemy import Column, String
+import os
 
 """
 Country related functionality
@@ -17,8 +19,8 @@ class Country(db.Model):
     __tablename__ = 'countries'
 
 
-    code = db.Column(db.String(3), primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
+    code = db.Column(db.String(3), unique=True, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
     cities = db.relationship('City', back_populates='country')
 
 
@@ -44,7 +46,10 @@ class Country(db.Model):
         """Get all countries"""
         from src.persistence import repo
 
-        countries: list["Country"] = repo.get_all("country")
+        if os.getenv("REPOSITORY") == "file":
+            countries: list["Country"] = repo.get_all("country")
+        else:
+            countries: list["Country"] = repo.get_all(Country)
 
         return countries
 

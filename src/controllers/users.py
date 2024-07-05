@@ -2,8 +2,12 @@
 Users controller module
 """
 
-from flask import abort, request
+from sys import audit
+import bcrypt
+from flask import abort, jsonify, request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from src.models.user import User
+from src import bcrypt
 
 
 def get_users():
@@ -61,3 +65,18 @@ def delete_user(user_id: str):
         abort(404, f"User with ID {user_id} not found")
 
     return "", 204
+
+def login():
+    email = request.json.get('email', None)
+    password_hash = request.json.get('password', None)
+    user = User.query.filter_by(email=email).first()
+    if user and bcrypt.check_password_hash(user.password_hash, password_hash):
+        additional_claims = {"is_admin": user.is_admin}
+        access_token = create_access_token(identity=email, additional_claims=additional_claims)
+        return jsonify(access_token=access_token), 200
+    return 'Wrong username or password', 401
+
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200

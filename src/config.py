@@ -78,5 +78,5 @@ class ProductionConfig(Config):
 
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
-        "postgresql://user:password@localhost/hbnb_prod"
+        "mysql+mysqldb://root:""@localhost/hbnb_prod"
     )
